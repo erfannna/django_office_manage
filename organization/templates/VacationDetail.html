@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% load to_jalali_datetime %}
+{% block include %}
+<link href="{% static "css/forms.css" %}" rel="stylesheet">
+<link href="{% static "css/log-detail.css" %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="log-detail-box">
+    <p><span class="log-label">نام متقاضی:</span><span class="log-text">{{ instance.user }}</span></p>
+    <p><span class="log-label">نام جایگزین:</span><span class="log-text">{{ instance.alternative }}</span></p>
+    <p><span class="log-label">تاریخ ثبت:</span><span class="log-text">{{ instance.created|to_jalali:'%Y/%m/%d - %H:%M' }}</span></p>
+    <p><span class="log-label">تاریخ شروع:</span><span class="log-text">{{ instance.start_date|to_jalali:'%Y/%m/%d - %H:%M' }}</span></p>
+    <p><span class="log-label">تاریخ پایان:</span><span class="log-text">{{ instance.end_date|to_jalali:'%Y/%m/%d - %H:%M' }}</span></p>
+    <p><span class="log-label">نوع مرخصی:</span><span class="log-text">{{ instance.type }}</span></p>
+    <p><span class="log-label">مدت:</span><span class="log-text">{{ instance.duration }}</span></p>
+    <p><span class="log-label">توضیحات:</span><span class="log-text">{% if instance.description %}{{ instance.description }}{% else %}بدون توضیحات{% endif %}</span></p>
+</div>
+{% with permissions=request.user.get_all_permissions %}
+{% if "organization.change_vacationrequest" in permissions %}
+<form class="formBox" method="post">
+    {% if message %}
+    <span class="message" style="color: {{ status }};">{{ message }}</span>
+    {% endif %}
+    {{ form.as_p }}
+    {% csrf_token %}
+    <input id="apply" type="submit" value="اعمال تغییرات">
+</form>
+{% endif %}
+{% endwith %}
+{% endblock %}
+
+{% block domready %}
+<script>
+
+</script>
+{% endblock %}
