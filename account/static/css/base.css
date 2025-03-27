@@ -194,10 +194,10 @@
     margin-top: 50px;
     padding: 0 80px;
     display: grid;
-    justify-items: center;
+    justify-items: start;
     direction: rtl;
     gap: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(195px, 0fr));
 }
 .boxItem {
     position: relative;

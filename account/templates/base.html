@@ -23,27 +23,37 @@
             <span class="cDetial">{{ request.user.groups.first.name }}</span>
         </div>
         <a href="/dashboard" class="menuItem {% if title == 'داشبورد' %}mItemSelected {% endif %}menuItemDash">داشبورد</a>
-        {% if request.user.groups.first.name != "کارمند" %}
+        {% with permissions=request.user.get_all_permissions %}
+        {% if "shop.view_productbuyorder" in permissions or "shop.view_productstockroomorder" in permissions or "organization.view_vacationrequest" in permissions or "organization.view_problemreport" in permissions %}
         <span class="menuCat">اتوماسیون</span>
         {% endif %}
-        {% if "shop.view_productbuyorder" in request.user.get_all_permissions %}
+        {% if "shop.view_productbuyorder" in permissions %}
         <a href="/product-buy-orders-logs" class="menuItem {% if title == 'سوابق درخواست خرید کالا' %}mItemSelected{% endif %}">سوابق درخواست خرید کالا</a>
         {% endif %}
-        {% if "shop.view_productstockroomorder" in request.user.get_all_permissions %}
+        {% if "shop.view_productstockroomorder" in permissions %}
         <a href="/product-from-stockroom-logs" class="menuItem {% if title == 'سوابق درخواست کالا از انبار' %}mItemSelected{% endif %}">سوابق درخواست کالا از انبار</a>
         {% endif %}
-        {% if "organization.view_vacationrequest" in request.user.get_all_permissions %}
+        {% if "organization.view_vacationrequest" in permissions %}
         <a href="/vacation-request-logs" class="menuItem {% if title == 'سوابق درخواست مرخصی' %}mItemSelected{% endif %}">سوابق درخواست مرخصی</a>
         {% endif %}
-        {% if "organization.view_problemreport" in request.user.get_all_permissions %}
+        {% if "organization.view_problemreport" in permissions %}
         <a href="/problem-report-logs" class="menuItem {% if title == 'سوابق ثبت خطا' %}mItemSelected{% endif %}">سوابق ثبت خطا</a>
         {% endif %}
         <span class="menuCat">کارتابل شما</span>
+        {% if "organization.add_vacationrequest" in permissions %}
         <a href="/vacation-requests" class="menuItem {% if title == 'وضعیت درخواست مرخصی' %}mItemSelected{% endif %}">وضعیت درخواست مرخصی</a>
         <a href="/alternative-requests" class="menuItem {% if title == 'درخواست های جانشینی' %}mItemSelected{% endif %}">درخواست های جانشینی</a>
+        {% endif %}
+        {% if "shop.add_productbuyorder" in permissions %}
         <a href="/product-buy-orders" class="menuItem {% if title == 'وضعیت درخواست خرید کالا' %}mItemSelected{% endif %}">وضعیت درخواست خرید کالا</a>
+        {% endif %}
+        {% if "shop.add_productstockroomorder" in permissions %}
         <a href="/product-requests-stockroom" class="menuItem {% if title == 'وضعیت درخواست کالا از انبار' %}mItemSelected{% endif %}">وضعیت درخواست کالا از انبار</a>
+        {% endif %}
+        {% if "organization.add_problemreport" in permissions %}
         <a href="/problem-reports" class="menuItem {% if title == 'وضعیت ثبت خطا' %}mItemSelected{% endif %}">وضعیت ثبت خطا</a>
+        {% endif %}
+        {% endwith %}
     </div>
     <div id="navBar">
         <a href="/logout" class="signOut">خروج از حساب</a>

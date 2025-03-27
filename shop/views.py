@@ -7,6 +7,7 @@ from organization.models import Log
 from .forms import SearchForm
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 
 
@@ -38,31 +39,34 @@ def buy_order_review(request, pk):
     instance = ProductBuyOrder.objects.get(id=pk)
 
     if request.method == 'POST':
-        form = ProductBuyReviewForm(data=request.POST, instance=instance)
-        note_form = NoteForm(data=request.POST)
-        if form.has_changed():
-            if instance.completed != bool(form.data.get('completed')):
-                message = f'وضعیت درخواست را از "{"انجام نشده" if instance.completed == False else "انجام شده"}" به "{"انجام شده" if form.data.get('completed') else "انجام نشده"}" تغییر داد.'
-                Log.objects.create(user=request.user,
-                                   action=message,
-                                   content_object=instance)
-            if instance.status != form.data['status']:
-                message2 = f'وضعیت درخواست را از "{instance.status}" به "{form.data['status']}" تغییر داد.'
-                Log.objects.create(user=request.user,
-                                   action=message2,
-                                   content_object=instance)
-        if form.is_valid() and note_form.is_valid():
-            cd = form.cleaned_data
-            new = form.save(commit=False)
-            new.save()
-            cd_note = note_form.cleaned_data
-            if cd_note["text"] != "":
-                new_note = note_form.save(commit=False)
-                new_note.user = request.user
-                new_note.content_object = instance
-                new_note.save()
+        if request.user.has_perm('shop.change_productbuyorder'):
+            form = ProductBuyReviewForm(data=request.POST, instance=instance)
+            note_form = NoteForm(data=request.POST)
+            if form.has_changed():
+                if instance.completed != bool(form.data.get('completed')):
+                    message = f'وضعیت درخواست را از "{"انجام نشده" if instance.completed == False else "انجام شده"}" به "{"انجام شده" if form.data.get('completed') else "انجام نشده"}" تغییر داد.'
+                    Log.objects.create(user=request.user,
+                                       action=message,
+                                       content_object=instance)
+                if instance.status != form.data['status']:
+                    message2 = f'وضعیت درخواست را از "{instance.status}" به "{form.data['status']}" تغییر داد.'
+                    Log.objects.create(user=request.user,
+                                       action=message2,
+                                       content_object=instance)
+            if form.is_valid() and note_form.is_valid():
+                cd = form.cleaned_data
+                new = form.save(commit=False)
+                new.save()
+                cd_note = note_form.cleaned_data
+                if cd_note["text"] != "":
+                    new_note = note_form.save(commit=False)
+                    new_note.user = request.user
+                    new_note.content_object = instance
+                    new_note.save()
 
-            return redirect('shop:buy_order_logs')
+                return redirect('shop:buy_order_logs')
+        else:
+            return PermissionDenied
     else:
         form = ProductBuyReviewForm(instance=instance)
         note_form = NoteForm(data=request.GET)
@@ -105,31 +109,34 @@ def stockroom_order(request):
 def stockroom_order_review(request, pk):
     instance = ProductStockroomOrder.objects.get(id=pk)
     if request.method == 'POST':
-        form = ProductStockReviewForm(data=request.POST, instance=instance)
-        note_form = NoteForm(data=request.POST)
-        if form.has_changed():
-            if instance.completed != bool(form.data.get('completed')):
-                message = f'وضعیت درخواست را از "{"انجام نشده" if instance.completed == False else "انجام شده"}" به "{"انجام شده" if form.data.get('completed') else "انجام نشده"}" تغییر داد.'
-                Log.objects.create(user=request.user,
-                                   action=message,
-                                   content_object=instance)
-            if instance.status != form.data['status']:
-                message2 = f'وضعیت درخواست را از "{instance.status}" به "{form.data['status']}" تغییر داد.'
-                Log.objects.create(user=request.user,
-                                   action=message2,
-                                   content_object=instance)
-        if form.is_valid() and note_form.is_valid():
-            cd = form.cleaned_data
-            new = form.save(commit=False)
-            new.save()
-            cd_note = note_form.cleaned_data
-            if cd_note["text"] != "":
-                new_note = note_form.save(commit=False)
-                new_note.user = request.user
-                new_note.content_object = instance
-                new_note.save()
+        if request.user.has_perm('shop.change_productstockroomorder'):
+            form = ProductStockReviewForm(data=request.POST, instance=instance)
+            note_form = NoteForm(data=request.POST)
+            if form.has_changed():
+                if instance.completed != bool(form.data.get('completed')):
+                    message = f'وضعیت درخواست را از "{"انجام نشده" if instance.completed == False else "انجام شده"}" به "{"انجام شده" if form.data.get('completed') else "انجام نشده"}" تغییر داد.'
+                    Log.objects.create(user=request.user,
+                                       action=message,
+                                       content_object=instance)
+                if instance.status != form.data['status']:
+                    message2 = f'وضعیت درخواست را از "{instance.status}" به "{form.data['status']}" تغییر داد.'
+                    Log.objects.create(user=request.user,
+                                       action=message2,
+                                       content_object=instance)
+            if form.is_valid() and note_form.is_valid():
+                cd = form.cleaned_data
+                new = form.save(commit=False)
+                new.save()
+                cd_note = note_form.cleaned_data
+                if cd_note["text"] != "":
+                    new_note = note_form.save(commit=False)
+                    new_note.user = request.user
+                    new_note.content_object = instance
+                    new_note.save()
 
-            return redirect('shop:stockroom_order_logs')
+                return redirect('shop:stockroom_order_logs')
+        else:
+            return PermissionDenied
     else:
         form = ProductStockReviewForm(instance=instance)
         note_form = NoteForm(data=request.GET)

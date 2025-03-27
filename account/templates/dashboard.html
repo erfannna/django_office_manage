@@ -1,9 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
 <div id="boxMenu">
+    {% with permissions=request.user.get_all_permissions %}
+    {% if "organization.add_vacationrequest" in permissions %}
     <a href="/vacation-request" class="boxItem"><span class="boxItemText">درخواست مرخصی</span><span class="boxItemIcon fi fi-rr-user-slash"></span></a>
+    {% endif %}
+    {% if "shop.add_productstockroomorder" in permissions %}
     <a href="/product-from-stockroom" class="boxItem"><span class="boxItemText">درخواست کالا از انبار</span><span class="boxItemIcon fi fi-rr-warehouse-alt"></span></a>
+    {% endif %}
+    {% if "shop.add_productbuyorder" in permissions %}
     <a href="/product-buy-order" class="boxItem"><span class="boxItemText">درخواست خرید کالا</span><span class="boxItemIcon fi fi-rr-shopping-cart"></span></a>
+    {% endif %}
+    {% if "organization.add_problemreport" in permissions %}
     <a href="/problem-report" class="boxItem"><span class="boxItemText">ثبت خطا</span><span class="boxItemIcon fi fi-rr-times-hexagon"></span></a>
+    {% endif %}
+    {% endwith %}
 </div>
 {% endblock %}

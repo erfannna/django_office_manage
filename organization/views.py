@@ -53,16 +53,19 @@ def vacation_request(request):
 def vacation_request_review(request, pk):
     instance = VacationRequest.objects.get(id=pk)
     if request.method == 'POST':
-        form = VacationRequestBossReviewForm(data=request.POST, instance=instance)
-        if form.has_changed():
-            message = f'وضعیت درخواست را از "{instance.status}" به "{form.data['status']}" تغییر داد.'
-            Log.objects.create(user=request.user,
-                               action=message,
-                               content_object=instance)
-        if form.is_valid():
-            form.save()
+        if request.user.has_perm('organization.change_vacationrequest'):
+            form = VacationRequestBossReviewForm(data=request.POST, instance=instance)
+            if form.has_changed():
+                message = f'وضعیت درخواست را از "{instance.status}" به "{form.data['status']}" تغییر داد.'
+                Log.objects.create(user=request.user,
+                                   action=message,
+                                   content_object=instance)
+            if form.is_valid():
+                form.save()
 
-            return redirect('organization:vacation_request_logs')
+                return redirect('organization:vacation_request_logs')
+        else:
+            return PermissionDenied
     else:
         form = VacationRequestBossReviewForm(instance=instance)
 
@@ -79,26 +82,29 @@ def vacation_request_review(request, pk):
 @permission_required("organization.add_vacationrequest", raise_exception=True)
 def alter_request_review(request, pk):
     instance = VacationRequest.objects.get(id=pk)
-    if request.method == 'POST':
-        form = VacationRequestAlterReviewForm(data=request.POST, instance=instance)
-        if form.has_changed():
-            message = f'وضعیت درخواست را از "{instance.status}" به "{form.data['status']}" تغییر داد.'
-            Log.objects.create(user=request.user,
-                               action=message,
-                               content_object=instance)
-        if form.is_valid():
-            form.save()
+    if instance.alternative == request.user:
+        if request.method == 'POST':
+            form = VacationRequestAlterReviewForm(data=request.POST, instance=instance)
+            if form.has_changed():
+                message = f'وضعیت درخواست را از "{instance.status}" به "{form.data['status']}" تغییر داد.'
+                Log.objects.create(user=request.user,
+                                   action=message,
+                                   content_object=instance)
+            if form.is_valid():
+                form.save()
 
-            return redirect('organization:alternative_requests')
+                return redirect('organization:alternative_requests')
+        else:
+            form = VacationRequestAlterReviewForm(instance=instance)
+
+            return render(request, "VacationDetail.html",
+                          {"title": "جزئیات درخواست مرخصی",
+                           "user": request.user,
+                           "form": form,
+                           "instance": instance
+                           })
     else:
-        form = VacationRequestAlterReviewForm(instance=instance)
-
-        return render(request, "VacationDetail.html",
-                      {"title": "جزئیات درخواست مرخصی",
-                       "user": request.user,
-                       "form": form,
-                       "instance": instance
-                       })
+        return PermissionDenied
 
 
 # all users vacation request logs for admin
