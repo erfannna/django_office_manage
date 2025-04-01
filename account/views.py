@@ -19,10 +19,10 @@ def user_login(request):
                     return redirect(next_url)
                 else:
                     return render(request, "login.html",
-                                  {"form": form, "status": "red", "message": "حساب شما غیرفعال است."})
+                                  {"form": form, "status": "red", "message": "حساب شما غیرفعال است.", "next": next_url})
             else:
                 return render(request, "login.html",
-                              {"form": form, "status": "red", "message": "کد ملی یا رمز عبور نامعتبر است."})
+                              {"form": form, "status": "red", "message": "کد ملی یا رمز عبور نامعتبر است.", "next": next_url})
     else:
         next_url = request.GET.get('next')
         if next_url is None:

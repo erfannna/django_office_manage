@@ -545,6 +545,6 @@
         margin: 80px 10px;
     }
     #mainContent {
-        align-items: unset;
+        align-items: flex-start;
     }
 }
